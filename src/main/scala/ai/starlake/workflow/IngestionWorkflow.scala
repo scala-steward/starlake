@@ -831,7 +831,7 @@ class IngestionWorkflow(
     } yield (domain, schema)
 
     cmdArgs match {
-      case Some((domain: Domain, schema: Schema)) =>
+      case Some(domain: Domain, schema: Schema) =>
         val stage: Stage = cliConfig.stage.getOrElse(Stage.UNIT)
         val result = new MetricsJob(
           domain,
