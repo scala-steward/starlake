@@ -66,10 +66,9 @@ object Unpacker {
     uncompressedInputStream: CompressorInputStream
   ): Try[ArchiveInputStream] =
     Try {
-      new ArchiveStreamFactory
-        .createArchiveInputStream(
-          getMarkableStream(uncompressedInputStream)
-        )
+      new ArchiveStreamFactory.createArchiveInputStream(
+        getMarkableStream(uncompressedInputStream)
+      )
     }
 
   private def createIterator(
