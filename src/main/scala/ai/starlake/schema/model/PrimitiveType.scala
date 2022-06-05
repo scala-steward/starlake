@@ -310,8 +310,7 @@ object PrimitiveType {
           case Some(zone) =>
             val locale = zone.split('_')
             val currentLocale: Locale = new Locale(locale(0), locale(1))
-            new DateTimeFormatterBuilder
-              .parseCaseInsensitive()
+            new DateTimeFormatterBuilder.parseCaseInsensitive()
               .appendPattern(pattern)
               .toFormatter
               .withLocale(currentLocale)
