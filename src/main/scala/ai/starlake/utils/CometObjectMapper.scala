@@ -29,8 +29,10 @@ class CometObjectMapper(
     /* this thing ensures we'll never attempt to serialize the ObjectMapper itself even if it appears in a class
     hierarchy. This happens, in particular, within [[Settings]].
      */
-    new SimpleModule
-      .setMixInAnnotation(classOf[ObjectMapper], classOf[CometObjectMapper.MixinsForObjectMapper])
+    new SimpleModule.setMixInAnnotation(
+      classOf[ObjectMapper],
+      classOf[CometObjectMapper.MixinsForObjectMapper]
+    )
   )
 
   if (injectables.nonEmpty) {
