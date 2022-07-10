@@ -1,11 +1,103 @@
+
 # Release notes
+
+# 0.3.20
+__Bug Fix__:
+- Keep retrocompatibility with scala 2.11
+
+# 0.3.19
+__New feature__:
+- Handle Mixed XSD / YML ingestion & validation
+- Support JSON / XML descriptions in XLS files
+- Support arrays in XLS files
+
+__Bug Fix__:
+- Support file system sink options in autojob
+
+# 0.3.18
+__New feature__:
+- Enhance XLS support for escaping char
+- Support HTTP Stream Source
+- Support XSD Validation
+- Transform  jobs now report on the number of affected rows.
+
+__Bug Fix__:
+- Regression return value of an autojob
+
+# 0.3.17
+__New feature__:
+- Support extra dsv options in conf file
+- support any option stored in metadata.options as an option for the reader.
+- Support VSCode  Development
+
+
+# 0.3.16
+__New feature__:
+- Upgrade Kafka libraries
+- Simplify removal of comments in autojobs SQL statements.
+
+# 0.3.15
+
+__New feature__:
+- deprecate usage of schema, schemaRefs in domains and dataset in autojobs. Prefer the use of table and tableRefs
+
+__Bug Fix__:
+- fix regression on Merge mode without Timestamp option
+
+# 0.3.14
+__Bug Fix__:
+- Xls2Yml - Get a correct sheet name based on the schema name field
+
+# 0.3.13
+__New feature__:
+- Improve XLS support for long name
+- Handle rate limit exceeded by setting COMET_GROUPED_MAX to avoid HTTP 429 on some cloud providers. 
+
+# 0.3.12
+__Bug Fix__: reorder transformation on attributes as follows:
+- rename columns
+  - run script fields
+  - apply transformations (privacy: "sql: ...")
+  - remove ignore fields
+  - remove input filename column
+
+# 0.3.11 
+__Bug Fix__:
+- Handle field relaxation when in Append Mode and table does not exist.
+
+# 0.3.9 / 0.3.10 / 0.3.11
+__Bug Fix__:
+- Make fields in rejected table optional
+
+# 0.3.8
+__New feature__:
+- Rollback on support for kafka.properties files. It is useless since we already have a server-options properties.
+
+# 0.3.7
+__New feature__:
+- Improve XLS support for metadata
+
+# 0.3.6
+__New feature__:
+- Autoload kafka.properties file from metadata directory.
+
+# 0.3.5
+__New feature__:
+- Parallel copy of files when loading and archiving
+- Support renaming of domains and schemas in XLS
+
+# 0.3.3 / 0.3.4
+- Fixing release process
+
+# 0.3.2
+__New feature__:
+- import step can be limited to one or more domains
 
 # 0.3.1
 __New feature__:
 - Update Kafka / BigQuery libraries
 - Add new  [preset env vars](https://starlake-ai.github.io/starlake/docs/reference/environment#preset-variables)
-
-__Bug Fix__:
+- Allow renaming of domains and schemas
 
 # 0.3.0
 __New feature__:
@@ -15,15 +107,11 @@ __New feature__:
 - Add support for generic sink
 - Allow use of custom deserializer on Kafka source
 
-__Bug Fix__:
-
 # 0.2.10
 __New feature__:
 - Drop Java 1.8 prerequisite for compilation  
 - Support custom database name for Hive compatible metastore
 - Support custom dataset name in BQ
-
-__Bug Fix__:
 
 # 0.2.9
 __New feature__:
@@ -31,8 +119,6 @@ __New feature__:
 - Allow table renaming on write
 - Any Spark supported input is now allowed
 - Env vars in env.yml files
-
-__Bug Fix__:
 
 # 0.2.8
 __New feature__:

@@ -150,7 +150,16 @@ case class Metadata(
   def getSink(): Option[Sink] = sink
 
   @JsonIgnore
-  def getOptions(): Map[String, String] = Map.empty
+  def getOptions(): Map[String, String] = options.getOrElse(Map.empty)
+
+  @JsonIgnore
+  def getXmlOptions(): Map[String, String] = xml.getOrElse(Map.empty)
+
+  @JsonIgnore
+  def getXsdPath(): Option[String] = {
+    val xmlOptions = xml.getOrElse(Map.empty)
+    xmlOptions.get("rowValidationXSDPath").orElse(xmlOptions.get("xsdPath"))
+  }
 
   /** Merge a single attribute
     *

@@ -2,13 +2,14 @@ package ai.starlake.job.sink.kafka
 
 import ai.starlake.config.Settings
 import ai.starlake.utils.CliConfig
-import org.apache.spark.sql.{DataFrame, SaveMode}
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import scopt.OParser
 
 case class KafkaJobConfig(
   topicConfigName: String = "",
   format: String = "parquet",
   mode: SaveMode = SaveMode.Append,
+  options: Map[String, String] = Map.empty,
   path: String = "",
   transform: Option[String] = None,
   offload: Boolean = true,
@@ -23,12 +24,12 @@ case class KafkaJobConfig(
   coalesce: Option[Int] = None
 )
 trait DataFrameTransform {
-  def transform(dataFrame: DataFrame): DataFrame
+  def transform(dataFrame: DataFrame, session: SparkSession): DataFrame
   def configure(topicConfig: Settings.KafkaTopicConfig): DataFrameTransform = this
 }
 
 abstract class AvroDataFrameTransform extends DataFrameTransform {
-  def transform(dataFrame: DataFrame): DataFrame = {
+  def transform(dataFrame: DataFrame, session: SparkSession): DataFrame = {
     dataFrame
   }
 }
@@ -86,6 +87,12 @@ object KafkaJobConfig extends CliConfig[KafkaJobConfig] {
         .action((x, c) => c.copy(writeOptions = x))
         .text(
           "Options to pass to Spark Writer"
+        )
+        .optional(),
+      opt[Map[String, String]]("options")
+        .action((x, c) => c.copy(options = x))
+        .text(
+          "Options to pass to Spark Reader"
         )
         .optional(),
       opt[Int]("coalesce")

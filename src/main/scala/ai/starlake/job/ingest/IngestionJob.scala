@@ -161,7 +161,7 @@ trait IngestionJob extends SparkJob {
           )
         } else {
           settings.comet.audit.sink match {
-            case _: NoneSink | FsSink(_, _, _, _, _, _) =>
+            case _: NoneSink | FsSink(_, _, _, _, _) =>
               sinkToFile(
                 rejectedDF,
                 rejectedPath,
@@ -290,8 +290,10 @@ trait IngestionJob extends SparkJob {
 
       val acceptedPath =
         new Path(DatasetArea.accepted(domain.getFinalName()), schema.getFinalName())
+      val acceptedRenamedFields = dfWithAttributesRenamed(validationResult.accepted)
+
       val acceptedDfWithScriptFields: DataFrame = computeScriptedAttributes(
-        validationResult.accepted
+        acceptedRenamedFields
       )
 
       val acceptedDfWithScriptAndTransformedFields: DataFrame = computeTransformedAttributes(
@@ -300,7 +302,7 @@ trait IngestionJob extends SparkJob {
       val acceptedDfWithoutIgnoredFields: DataFrame = removeIgnoredAttributes(
         acceptedDfWithScriptAndTransformedFields
       )
-      val acceptedDF = dfWithAttributesRenamed(acceptedDfWithoutIgnoredFields)
+      val acceptedDF = acceptedDfWithoutIgnoredFields.drop(CometColumns.cometInputFileNameColumn)
       val finalAcceptedDF: DataFrame = computeFinalSchema(acceptedDF).cache()
       runAssertions(finalAcceptedDF)
       runMetrics(finalAcceptedDF)
@@ -429,7 +431,7 @@ trait IngestionJob extends SparkJob {
   private def removeIgnoredAttributes(
     acceptedDfWithScriptAndTransformedFields: DataFrame
   ): DataFrame = {
-    val ignoredAttributes = schema.attributes.filter(_.isIgnore()).map(_.name)
+    val ignoredAttributes = schema.attributes.filter(_.isIgnore()).map(_.getFinalName())
     val acceptedDfWithoutIgnoredFields =
       acceptedDfWithScriptAndTransformedFields.drop(ignoredAttributes: _*)
     acceptedDfWithoutIgnoredFields
@@ -439,7 +441,7 @@ trait IngestionJob extends SparkJob {
     val sqlAttributes = schema.attributes.filter(_.getPrivacy().sql).filter(_.transform.isDefined)
     sqlAttributes.foldLeft(acceptedDfWithScriptFields) { case (df, attr) =>
       df.withColumn(
-        attr.name,
+        attr.getFinalName(),
         expr(
           attr.transform
             .getOrElse(throw new Exception("Should never happen"))
@@ -453,14 +455,13 @@ trait IngestionJob extends SparkJob {
   private def computeScriptedAttributes(acceptedDF: DataFrame): DataFrame = {
     schema.attributes
       .filter(_.script.isDefined)
-      .map(attr => (attr.name, attr.sparkType(schemaHandler), attr.script))
+      .map(attr => (attr.getFinalName(), attr.sparkType(schemaHandler), attr.script))
       .foldLeft(acceptedDF) { case (df, (name, sparkType, script)) =>
         df.withColumn(
           name,
           expr(script.getOrElse("").richFormat(schemaHandler.activeEnv, options)).cast(sparkType)
         )
       }
-      .drop(CometColumns.cometInputFileNameColumn)
   }
 
   private def sink(
@@ -721,7 +722,7 @@ trait IngestionJob extends SparkJob {
         (clusteredDFWriter, dataset)
 
       // We do not output empty datasets
-      if (!finalDataset.isEmpty) {
+      if (finalDataset.limit(1).count() == 1) {
         val finalTargetDatasetWriter =
           if (csvOutput() && area != StorageArea.rejected) {
             targetDatasetWriter
@@ -1079,7 +1080,7 @@ object IngestionUtil {
     val fields = rejectedCols map { case (attrName, attrLegacyType, attrStandardType) =>
       Field
         .newBuilder(attrName, attrLegacyType)
-        .setMode(Field.Mode.REQUIRED)
+        .setMode(Field.Mode.NULLABLE)
         .setDescription("")
         .build()
     }
@@ -1147,7 +1148,7 @@ object IngestionUtil {
         case _: EsSink =>
           // TODO Sink Rejected Log to ES
           throw new Exception("Sinking Audit log to Elasticsearch not yet supported")
-        case _: NoneSink | FsSink(_, _, _, _, _, _) =>
+        case _: NoneSink | FsSink(_, _, _, _, _) =>
           // We save in the caller
           // TODO rewrite this one
           Success(())
