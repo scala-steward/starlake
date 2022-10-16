@@ -1,6 +1,51 @@
 
 # Release notes
 
+# 0.4.2
+__Bgu Fix__:
+- Use Spark Project Jetty shaded class to remove extra jetty dependency in Starlake server
+
+# 0.4.1
+__New feature__:
+- Added "serve --port 7070" to start starlake in server mode and wait for requests
+
+# 0.4.0
+__New feature__:
+- Support any source to any sink using kafkaload including sink and source that are not kafka. This has been possible at the cost of a breaking change
+- Support table and column remarks extraction on DB2 iSeries databases
+
+__CI__:
+ - remove support of github registry
+ - Remove scala 2.11 support
+
+# 0.3.26
+__New feature__:
+- Support JINJA in autojob
+- Support external views defined using JINJA
+- File Splitter allow to split file based on first column or position in line.
+
+# 0.3.25
+__New feature__:
+- Add ACL Graph generation
+
+# 0.3.24
+__Bug Fix__:
+- Improve GraphViz Generation
+
+# 0.3.23
+__Bug Fix__:
+- Generate final name in Graphiz diagram
+
+# 0.3.22
+__New feature__:
+- Improve cli doc generation. Extra doc can be added in docs/merge/cli folder
+- prepare to deprecate xml tag in metadata section.
+
+__Bug Fix__:
+- Code improvement: JDBC is handled as a generic sink
+- add extra parenthesis in BQ queries only for SELECT and WITH requests
+
+
 # 0.3.21
 __New feature__:
 - Reduce assembly size
@@ -10,7 +55,6 @@ __New feature__:
 
 __Bug Fix__:
 - Support empty env files
-- 
 
 # 0.3.20
 __Bug Fix__:
